@@ -7,3 +7,4 @@ indic-transliteration
 nest_asyncio
 python-multipart
 sse-starlette
+ephem
