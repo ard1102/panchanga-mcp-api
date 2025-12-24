@@ -79,6 +79,8 @@ class APIKeyMiddleware(BaseHTTPMiddleware):
              
         # 1. Check Header
         api_key = request.headers.get(API_KEY_NAME)
+        if not api_key:
+            api_key = request.headers.get("MCP_API_KEY") # Fallback for user convenience
         
         # 2. Check Query Parameter (if header is missing)
         if not api_key:
@@ -100,6 +102,14 @@ class APIKeyMiddleware(BaseHTTPMiddleware):
 # Create a secure wrapper application
 secure_app = FastAPI()
 secure_app.add_middleware(APIKeyMiddleware)
+
+@secure_app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    import traceback
+    error_detail = "".join(traceback.format_exception(type(exc), exc, exc.__traceback__))
+    print(f"CRITICAL ERROR in {request.url.path}: {exc}")
+    print(error_detail)
+    return JSONResponse(status_code=500, content={"detail": str(exc), "trace": error_detail})
 
 @secure_app.get("/health")
 async def health_check():
