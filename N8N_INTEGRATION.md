@@ -7,7 +7,7 @@ You have three ways to use the Panchangam service in n8n.
 If you are using the **AI Agent** node in n8n (versions 1.70+), you can connect this tool directly as an MCP Tool.
 
 ### ⚠️ IMPORTANT: Authentication Requirement
-You **MUST** use the **Additional Headers** field for authentication. 
+You **MUST** use the **Header Auth** option.
 **Do NOT** rely solely on the query parameter (`?api_key=...`) in the URL.
 *   **Why?** The MCP protocol involves a "handshake" where the server tells the client a new URL to send messages to. This new URL *does not* include your original query parameters. If you don't use headers, the connection will break immediately after the handshake (Tool Discovery will fail).
 
@@ -16,11 +16,10 @@ You **MUST** use the **Additional Headers** field for authentication.
 2.  Click **"Add Tool"** -> Select **"MCP Tool"**.
 3.  **Create New Credentials**:
     *   **Type**: Select **"MCP Client (HTTP Streamable) API"**.
-    *   **HTTP Streamable URL**: `https://panchang-mcp.visionpair.cloud/sse`
-    *   **Additional Headers**: 
-        ```
-        X-API-Key: YOUR_API_KEY_HERE
-        ```
+    *   **HTTP Streamable URL**: `https://panchang-mcp.visionpair.cloud/sse` (Do **NOT** add `?api_key=` here)
+    *   **Authentication**: Select **Header Auth**.
+    *   **Header Name**: `X-API-Key`
+    *   **Header Value**: `YOUR_API_KEY_HERE`
         *(Replace `YOUR_API_KEY_HERE` with your actual key)*
 
 4.  The AI Agent will now automatically see all available tools:
