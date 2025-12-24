@@ -6,10 +6,10 @@ You have three ways to use the Panchangam service in n8n.
 
 If you are using the **AI Agent** node in n8n (versions 1.70+), you can connect this tool directly as an MCP Tool.
 
-### How it Works
-1.  **Connection**: n8n connects to the Panchangam MCP server using a persistent **HTTP Streamable** connection.
-2.  **Discovery**: Upon connection, n8n automatically retrieves the list of available tools (`get_panchanga_data`, `get_sankalpam_text`, etc.).
-3.  **Execution**: When you ask the AI Agent a question (e.g., "What is the Sankalpam for New York?"), the LLM decides which tool to call. n8n sends this request to the server, which executes the Python code and returns the result.
+### ⚠️ IMPORTANT: Authentication Requirement
+You **MUST** use the **Additional Headers** field for authentication. 
+**Do NOT** rely solely on the query parameter (`?api_key=...`) in the URL.
+*   **Why?** The MCP protocol involves a "handshake" where the server tells the client a new URL to send messages to. This new URL *does not* include your original query parameters. If you don't use headers, the connection will break immediately after the handshake (Tool Discovery will fail).
 
 ### Configuration Steps
 1.  Open your **AI Agent** node.
@@ -21,12 +21,18 @@ If you are using the **AI Agent** node in n8n (versions 1.70+), you can connect 
         ```
         X-API-Key: YOUR_API_KEY_HERE
         ```
-        *(If your n8n version doesn't support "Additional Headers", append `?api_key=YOUR_API_KEY_HERE` to the URL instead).*
+        *(Replace `YOUR_API_KEY_HERE` with your actual key)*
 
 4.  The AI Agent will now automatically see all available tools:
     *   `get_panchanga_data`
     *   `get_sankalpam_text`
     *   `get_sankalpam_audio`
+
+### How it Works
+1.  **Connection**: n8n connects to `/sse` (Authenticated via Header).
+2.  **Discovery**: Server returns a new endpoint `/messages?session_id=...`.
+3.  **Execution**: n8n posts to `/messages` (Authenticated via Header). 
+    *If you missed the header, this step fails with 403 Forbidden.*
 
 ---
 
