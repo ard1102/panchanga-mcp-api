@@ -54,8 +54,8 @@ cd panchanga-dotnet
 ```
 
 The API will be available at:
-- **HTTP**: http://localhost:5000
-- **HTTPS**: https://localhost:5001
+- **MCP Server (Python)**: http://localhost:8000 (Primary for AI/n8n)
+- **Backend API (.NET)**: http://localhost:8080 (Calculation Engine)
 
 ### Alternative Launch Methods
 ```bash

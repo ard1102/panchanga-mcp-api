@@ -2,20 +2,41 @@
 
 You can integrate this MCP server with various IDEs and AI tools.
 
-## 1. Claude Desktop (Local)
+## 1. Remote Integration (No Local Install) - Recommended for Cursor
 
-To run the MCP server locally and connect it to Claude Desktop:
+If you have deployed the server (e.g., to Coolify) and have an API Key, you can connect directly without installing Python or dependencies locally.
 
-1.  Ensure you have **Python 3.12+** installed.
-2.  Install dependencies:
+### Cursor / VS Code (via SSE)
+
+Cursor and some VS Code extensions support connecting to MCP servers via **SSE (Server-Sent Events)** URLs.
+
+1.  Open **Cursor Settings** > **Features** > **MCP** (or similar menu).
+2.  Add a new MCP Server:
+    *   **Type**: SSE
+    *   **URL**: `https://panchang-mcp.visionpair.cloud/sse?api_key=YOUR_API_KEY_HERE`
+    
+    *(Replace `YOUR_API_KEY_HERE` with your actual API Key)*
+
+**Note**: We use the `?api_key=` query parameter because many current IDE UIs do not yet allow setting custom headers for MCP connections.
+
+---
+
+## 2. Claude Desktop (Local Install Required)
+
+Currently, **Claude Desktop** primarily supports running local commands (`stdio`). It does not natively support connecting to a remote SSE URL without a local "bridge" script.
+
+To use this with Claude Desktop, you must run the server code locally on your machine.
+
+1.  **Install Python 3.12+**.
+2.  **Install dependencies**:
     ```bash
     pip install -r requirements.txt
     ```
-3.  Edit your Claude Desktop configuration file:
+3.  **Edit Configuration**:
     -   **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
     -   **Mac**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 
-    Add the following configuration (update the path to your project):
+    Add this config (update the path):
 
     ```json
     {
@@ -24,38 +45,21 @@ To run the MCP server locally and connect it to Claude Desktop:
           "command": "python",
           "args": [
             "C:/Path/To/Your/Project/panchanga-api/run_local.py"
-          ]
+          ],
+          "env": {
+            "PANCHANGAM_API_URL": "https://panchang.visionpair.cloud/api/panchanga"
+          }
         }
       }
     }
     ```
+    
+    **Tip**: By setting `PANCHANGAM_API_URL` to your live backend (as shown above), you avoid needing to run the .NET backend locally!
 
-4.  Restart Claude Desktop. You should see a generic "tool" icon indicating the server is connected.
-
----
-
-## 2. Cursor (via SSE)
-
-Cursor is adding support for MCP. Since you have a deployed SSE endpoint, you can try connecting via the "MCP" or "Model Context Protocol" settings if available in your version.
-
-*   **URL**: `https://panchang-mcp.visionpair.cloud/sse`
-*   **Transport**: SSE
-
-*(Note: Cursor's MCP support is evolving rapidly; check their latest docs for specific configuration steps.)*
+4.  **Restart Claude Desktop**.
 
 ---
 
-## 3. VS Code (via Extensions)
+## 3. N8N Integration (Web)
 
-You can use extensions like "MCP Client" to connect to your server.
-
-1.  **Local (Stdio)**: Point the extension to `run_local.py` (similar to Claude Desktop).
-2.  **Remote (SSE)**: Configure the extension to connect to `https://panchang-mcp.visionpair.cloud/sse` with your API Key in the headers.
-
----
-
-## 4. Windsurf / Other IDEs
-
-Most MCP-compatible IDEs support the `stdio` method for local scripts. Follow the same pattern as Claude Desktop:
--   **Command**: `python`
--   **Args**: `["/absolute/path/to/run_local.py"]`
+See [N8N_INTEGRATION.md](N8N_INTEGRATION.md) for details on how to use the REST API endpoints in your workflows.
