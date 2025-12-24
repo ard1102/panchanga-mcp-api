@@ -77,7 +77,13 @@ class APIKeyMiddleware(BaseHTTPMiddleware):
         if request.url.path in ["/health", "/docs", "/openapi.json"]:
              return await call_next(request)
              
+        # 1. Check Header
         api_key = request.headers.get(API_KEY_NAME)
+        
+        # 2. Check Query Parameter (if header is missing)
+        # This is useful for SSE connections where setting headers might be difficult
+        if not api_key:
+            api_key = request.query_params.get("api_key")
         
         if not api_key or api_key != API_KEY:
              return JSONResponse(status_code=403, content={"detail": "Invalid or missing API Key"})
