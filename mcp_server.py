@@ -67,6 +67,8 @@ def get_sankalpam_audio(latitude: float, longitude: float, timezone: float, year
     return result
 
 # -----------------------------------------------------------------------------
+from fastapi.middleware.cors import CORSMiddleware
+
 # Security
 # -----------------------------------------------------------------------------
 
@@ -81,6 +83,11 @@ class APIKeyMiddleware:
 
         request = Request(scope, receive)
         path = request.url.path
+        
+        # 0. Allow OPTIONS requests (CORS Preflight)
+        if request.method == "OPTIONS":
+            await self.app(scope, receive, send)
+            return
         
         # Allow health checks or open endpoints
         if path in ["/health", "/docs", "/openapi.json"]:
@@ -110,6 +117,16 @@ class APIKeyMiddleware:
 
 # Create a secure wrapper application
 secure_app = FastAPI()
+
+# Add CORS Middleware
+secure_app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all methods (including OPTIONS)
+    allow_headers=["*"],  # Allow all headers
+)
+
 secure_app.add_middleware(APIKeyMiddleware)
 
 @secure_app.exception_handler(Exception)
