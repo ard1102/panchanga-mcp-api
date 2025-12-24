@@ -81,11 +81,14 @@ class APIKeyMiddleware(BaseHTTPMiddleware):
         api_key = request.headers.get(API_KEY_NAME)
         
         # 2. Check Query Parameter (if header is missing)
-        # This is useful for SSE connections where setting headers might be difficult
         if not api_key:
             api_key = request.query_params.get("api_key")
         
+        # Debugging Print (Visible in docker logs)
+        # print(f"DEBUG: Path={request.url.path}, API_KEY_RECEIVED={api_key}, EXPECTED={API_KEY}")
+
         if not api_key or api_key != API_KEY:
+             print(f"AUTH FAILED: Path={request.url.path}, Received={api_key}")
              return JSONResponse(status_code=403, content={"detail": "Invalid or missing API Key"})
              
         return await call_next(request)
