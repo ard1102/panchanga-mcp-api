@@ -1,24 +1,34 @@
 # n8n Integration Guide
 
-You have two main ways to use the Panchangam service in n8n.
+You have three ways to use the Panchangam service in n8n.
 
-## Option 1: Secured API (High Precision & Voice) - **RECOMMENDED**
+## Option 1: Native MCP Integration (Recommended for AI Agents)
 
-Use this option if you want:
-*   **High Precision Calculations** (using PyEphem)
-*   **Audio/Voice Generation**
-*   **Authentication** (Security)
-*   **Easy integration via standard HTTP Request nodes**
+If you are using the **AI Agent** node in n8n (versions 1.70+), you can connect this tool directly as an MCP Tool.
 
-### Configuration
-*   **Base URL**: `https://panchang-mcp.visionpair.cloud`
-*   **Authentication**: You **MUST** send your API Key in the headers.
+1.  Open your **AI Agent** node.
+2.  Click **"Add Tool"** -> Select **"MCP Tool"**.
+3.  In the MCP Tool configuration:
+    *   **Connection Type**: Select **"HTTP streamable"** (Note: In some versions this might be labeled "SSE", but "HTTP streamable" is the newer standard for MCP in n8n).
+    *   **Server URL**: `https://panchang-mcp.visionpair.cloud/sse?api_key=YOUR_API_KEY_HERE`
+    
+    *(We use the `?api_key=` query parameter because n8n's MCP UI may not yet support custom headers).*
 
-### Steps in n8n
+4.  The AI Agent will now automatically see all available tools:
+    *   `get_panchanga_data`
+    *   `get_sankalpam_text`
+    *   `get_sankalpam_audio`
+
+---
+
+## Option 2: Secured HTTP API (Standard Workflows)
+
+Use this if you are building a standard workflow (without AI Agent) or prefer manual control.
+
 1.  Add an **HTTP Request** node.
 2.  **Method**: `GET`
 3.  **URL**: Choose one of the endpoints below.
-4.  **Headers**: Add a header named `X-API-Key` with your secret key (set in Coolify).
+4.  **Headers**: Add a header named `X-API-Key` with your secret key.
 5.  **Query Parameters**: Add `latitude`, `longitude`, `timezone`, `locationName`.
 
 ### Endpoints
@@ -30,53 +40,8 @@ Use this option if you want:
 
 ---
 
-## Option 2: Public API (Basic Data)
-
-Use this option ONLY if you want basic calculations without authentication and do not need voice generation.
+## Option 3: Legacy / Public API
 
 *   **Base URL**: `https://panchang.visionpair.cloud/api/panchanga`
 *   **Authentication**: None
-*   **Features**: Basic Panchanga data only (No Voice).
-
----
-
-## Example: AI Agent Tool Definition
-
-If you are using the **AI Agent** node, use **Option 1** for the best results.
-
-**Tool Name**: `get_sankalpam_voice`
-**Description**: `Generates audio and text for Hindu Sankalpam.`
-
-**JSON Schema:**
-```json
-{
-  "type": "object",
-  "properties": {
-    "latitude": { "type": "number" },
-    "longitude": { "type": "number" },
-    "timezone": { "type": "number" },
-    "locationName": { "type": "string" },
-    "year": { "type": "integer" },
-    "month": { "type": "integer" },
-    "day": { "type": "integer" }
-  },
-  "required": ["latitude", "longitude", "timezone"]
-}
-```
-
-**Workflow Connection**:
-*   Connect the tool to an **HTTP Request** node.
-*   **URL**: `https://panchang-mcp.visionpair.cloud/api/voice`
-*   **Header**: `X-API-Key: YOUR_SECRET_KEY`
-
----
-
-## Option 3: Native MCP Connection (Advanced)
-
-If you are using an **MCP Client Node** (available in newer versions of n8n or custom setups), you can connect directly to the SSE stream.
-
-*   **Transport**: SSE (Server-Sent Events)
-*   **URL**: `https://panchang-mcp.visionpair.cloud/sse`
-*   **Authentication**:
-    *   **Header**: `X-API-Key: YOUR_SECRET_KEY`
-    *   **Query Param**: `?api_key=YOUR_SECRET_KEY` (if headers are not supported by your client)
+*   **Features**: Basic Panchanga data only (No Voice, No High Precision).
