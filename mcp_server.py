@@ -68,14 +68,22 @@ def get_sankalpam_audio(latitude: float, longitude: float, timezone: float, year
 # Security
 # -----------------------------------------------------------------------------
 
-class APIKeyMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        # Allow health checks or open endpoints if needed
-        # MCP SSE endpoint is usually /sse
-        # MCP Messages endpoint is usually /messages
+class APIKeyMiddleware:
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+
+        request = Request(scope, receive)
+        path = request.url.path
         
-        if request.url.path in ["/health", "/docs", "/openapi.json"]:
-             return await call_next(request)
+        # Allow health checks or open endpoints
+        if path in ["/health", "/docs", "/openapi.json"]:
+             await self.app(scope, receive, send)
+             return
              
         # 1. Check Header
         api_key = request.headers.get(API_KEY_NAME)
@@ -85,15 +93,14 @@ class APIKeyMiddleware(BaseHTTPMiddleware):
         # 2. Check Query Parameter (if header is missing)
         if not api_key:
             api_key = request.query_params.get("api_key")
-        
-        # Debugging Print (Visible in docker logs)
-        # print(f"DEBUG: Path={request.url.path}, API_KEY_RECEIVED={api_key}, EXPECTED={API_KEY}")
 
         if not api_key or api_key != API_KEY:
-             print(f"AUTH FAILED: Path={request.url.path}, Received={api_key}")
-             return JSONResponse(status_code=403, content={"detail": "Invalid or missing API Key"})
+             print(f"AUTH FAILED: Path={path}, Received={api_key}")
+             response = JSONResponse(status_code=403, content={"detail": "Invalid or missing API Key"})
+             await response(scope, receive, send)
+             return
              
-        return await call_next(request)
+        await self.app(scope, receive, send)
 
 # -----------------------------------------------------------------------------
 # Server Application Expose
