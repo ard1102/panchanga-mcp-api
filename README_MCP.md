@@ -46,6 +46,16 @@ To connect this server to an MCP-compatible agent:
     -   **Header Name**: `X-API-Key`
     -   **Value**: `panchanga-secret-key` (or your configured key)
 
+    *Alternative*: You can also pass the key as a query parameter: `?api_key=YOUR_KEY`
+
+### REST Endpoints
+For clients that don't support MCP/SSE, the following REST endpoints are available (secured with the same API Key):
+
+- `GET /health` - Health check (No auth required)
+- `GET /api/panchanga` - Get Panchanga details
+- `GET /api/sankalpam` - Get Sankalpam text
+- `GET /api/voice` - Get Sankalpam audio (Base64)
+
 ### Tools Available
 
 1.  `get_panchanga_data(latitude, longitude, timezone, ...)`

@@ -1,6 +1,15 @@
-# Panchanga API
+# Panchanga API & MCP Server
 
-A comprehensive .NET 8 Web API for calculating Hindu Panchanga (traditional calendar) information based on astronomical calculations. Production-ready with intelligent deployment options and automatic fallback handling.
+A comprehensive .NET 8 Web API for calculating Hindu Panchanga (traditional calendar) information, paired with a **Python MCP (Model Context Protocol) Server** for AI Agent integration.
+
+## 🤖 AI / MCP Integration
+
+If you are looking to use this with **Claude**, **n8n**, or other AI agents, please check the dedicated documentation:
+
+👉 **[MCP Server Documentation](README_MCP.md)**
+👉 **[n8n Integration Guide](N8N_INTEGRATION.md)**
+
+---
 
 ## 🎯 Overview
 

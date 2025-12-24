@@ -8,6 +8,7 @@ Use this option if you want:
 *   **High Precision Calculations** (using PyEphem)
 *   **Audio/Voice Generation**
 *   **Authentication** (Security)
+*   **Easy integration via standard HTTP Request nodes**
 
 ### Configuration
 *   **Base URL**: `https://panchang-mcp.visionpair.cloud`
@@ -67,3 +68,15 @@ If you are using the **AI Agent** node, use **Option 1** for the best results.
 *   Connect the tool to an **HTTP Request** node.
 *   **URL**: `https://panchang-mcp.visionpair.cloud/api/voice`
 *   **Header**: `X-API-Key: YOUR_SECRET_KEY`
+
+---
+
+## Option 3: Native MCP Connection (Advanced)
+
+If you are using an **MCP Client Node** (available in newer versions of n8n or custom setups), you can connect directly to the SSE stream.
+
+*   **Transport**: SSE (Server-Sent Events)
+*   **URL**: `https://panchang-mcp.visionpair.cloud/sse`
+*   **Authentication**:
+    *   **Header**: `X-API-Key: YOUR_SECRET_KEY`
+    *   **Query Param**: `?api_key=YOUR_SECRET_KEY` (if headers are not supported by your client)
