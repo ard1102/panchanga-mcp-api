@@ -13,7 +13,9 @@ API_KEY_NAME = "X-API-Key"
 API_KEY = os.getenv("MCP_API_KEY", "panchanga-secret-key")
 
 # Initialize FastMCP
-mcp = FastMCP("Panchangam Service")
+# We set host="0.0.0.0" to ensure it binds/allows all interfaces, though we mount it manually.
+# This helps prevent "Invalid Host header" (421) errors if FastMCP sets up TrustedHostMiddleware.
+mcp = FastMCP("Panchangam Service", host="0.0.0.0")
 
 # -----------------------------------------------------------------------------
 # Tool Definitions
