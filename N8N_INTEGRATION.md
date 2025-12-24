@@ -35,7 +35,58 @@ You **MUST** use the **Header Auth** option.
 
 ---
 
-## Option 2: Secured HTTP API (Standard Workflows)
+## Option 2: Add as "Workflow Tool" (Alternative to MCP)
+
+If MCP integration is not available or failing, you can add the API as a **Workflow Tool**. This is the standard way to add custom capabilities to an AI Agent in n8n.
+
+### Step 1: Create the "Panchanga Tool" Workflow
+1.  Create a **New Workflow**.
+2.  **Trigger**: Add an **"Execute Workflow Trigger"** node.
+    *   Leave settings as default.
+3.  **Action**: Add an **"HTTP Request"** node.
+    *   **Method**: `GET`
+    *   **URL**: `https://panchang-mcp.visionpair.cloud/api/panchanga`
+    *   **Authentication**: Generic Credential Type -> **Header Auth**.
+        *   **Name**: `X-API-Key`
+        *   **Value**: `YOUR_API_KEY`
+    *   **Query Parameters**:
+        *   `latitude`: `{{ $json.latitude }}`
+        *   `longitude`: `{{ $json.longitude }}`
+        *   `timezone`: `{{ $json.timezone }}`
+        *   `location_name`: `{{ $json.location_name }}` (Optional)
+4.  **Output**: Add a **"Respond to Webhook"** node (or just ensure the HTTP Request is the last node).
+    *   **Respond With**: JSON
+    *   **Response Body**: `{{ $json }}` (The output of the HTTP Request)
+5.  **Save** this workflow (e.g., name it "Tool - Get Panchanga").
+
+### Step 2: Connect to AI Agent
+1.  Go back to your **AI Agent** workflow.
+2.  Add a **"Workflow Tool"** node.
+3.  **Connect** it to the "Tools" input of the AI Agent node.
+4.  **Configuration**:
+    *   **Name**: `get_panchanga`
+    *   **Description**: `Call this tool to get Hindu Panchanga details (Tithi, Nakshatra, Yoga) for a specific location and date.`
+    *   **Workflow ID**: Select the "Tool - Get Panchanga" workflow you created in Step 1.
+    *   **Schema** (JSON):
+        ```json
+        {
+          "type": "object",
+          "properties": {
+            "latitude": { "type": "number", "description": "Latitude of the location" },
+            "longitude": { "type": "number", "description": "Longitude of the location" },
+            "timezone": { "type": "number", "description": "Timezone offset (e.g., 5.5 for IST)" },
+            "location_name": { "type": "string", "description": "Name of the city/location" }
+          },
+          "required": ["latitude", "longitude", "timezone"]
+        }
+        ```
+
+### Repeat for other tools
+You can create similar "Tool Workflows" for `get_sankalpam_text` (`/api/sankalpam`) and `get_sankalpam_audio` (`/api/voice`).
+
+---
+
+## Option 3: Secured HTTP API (Standard Workflows)
 
 Use this if you are building a standard workflow (without AI Agent) or prefer manual control.
 
@@ -54,7 +105,7 @@ Use this if you are building a standard workflow (without AI Agent) or prefer ma
 
 ---
 
-## Option 3: Legacy / Public API
+## Option 4: Legacy / Public API
 
 *   **Base URL**: `https://panchang.visionpair.cloud/api/panchanga`
 *   **Authentication**: None
