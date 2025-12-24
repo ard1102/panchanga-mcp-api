@@ -1,82 +1,69 @@
 # n8n Integration Guide
 
-Since **n8n** is a workflow automation tool that excels at connecting to APIs, the best way to use your Panchangam service in n8n is to connect directly to your **REST API** (`panchang.visionpair.cloud`).
+You have two main ways to use the Panchangam service in n8n.
 
-While the **MCP Server** (`panchang-mcp...`) is designed for AI clients like Claude Desktop or Cursor, **n8n** works best with the standard API endpoints.
+## Option 1: Secured API (High Precision & Voice) - **RECOMMENDED**
 
-## Option 1: Using with AI Agent (LangChain)
+Use this option if you want:
+*   **High Precision Calculations** (using PyEphem)
+*   **Audio/Voice Generation**
+*   **Authentication** (Security)
 
-If you are building an AI Agent in n8n (using the **AI Agent** node), you should add a **Custom Tool**.
+### Configuration
+*   **Base URL**: `https://panchang-mcp.visionpair.cloud`
+*   **Authentication**: You **MUST** send your API Key in the headers.
 
-1.  Add a **Define Custom Tool** node (under LangChain > Tools).
-2.  Connect it to your **AI Agent** node.
-3.  Configure the tool as follows:
+### Steps in n8n
+1.  Add an **HTTP Request** node.
+2.  **Method**: `GET`
+3.  **URL**: Choose one of the endpoints below.
+4.  **Headers**: Add a header named `X-API-Key` with your secret key (set in Coolify).
+5.  **Query Parameters**: Add `latitude`, `longitude`, `timezone`, `locationName`.
 
-*   **Name**: `get_panchanga`
-*   **Description**: `Retrieves accurate Hindu Panchangam details (Tithi, Nakshatra, Sankalpam) for a specific location and date.`
-*   **Schema Type**: `JSON`
+### Endpoints
+| Endpoint | Description |
+| :--- | :--- |
+| `/api/panchanga` | Returns accurate Tithi, Nakshatra, and other details. |
+| `/api/sankalpam` | Returns the full Sankalpam text (Sanskrit/IAST). |
+| `/api/voice` | Returns the audio file as a Base64 string (`audio_base64`). |
+
+---
+
+## Option 2: Public API (Basic Data)
+
+Use this option ONLY if you want basic calculations without authentication and do not need voice generation.
+
+*   **Base URL**: `https://panchang.visionpair.cloud/api/panchanga`
+*   **Authentication**: None
+*   **Features**: Basic Panchanga data only (No Voice).
+
+---
+
+## Example: AI Agent Tool Definition
+
+If you are using the **AI Agent** node, use **Option 1** for the best results.
+
+**Tool Name**: `get_sankalpam_voice`
+**Description**: `Generates audio and text for Hindu Sankalpam.`
 
 **JSON Schema:**
 ```json
 {
   "type": "object",
   "properties": {
-    "latitude": {
-      "type": "number",
-      "description": "Latitude of the location (e.g., 33.15)"
-    },
-    "longitude": {
-      "type": "number",
-      "description": "Longitude of the location (e.g., -96.82)"
-    },
-    "timezone": {
-      "type": "number",
-      "description": "Timezone offset from UTC (e.g., -6.0 for CST)"
-    },
-    "year": {
-      "type": "integer",
-      "description": "Year (optional, defaults to current)"
-    },
-    "month": {
-      "type": "integer",
-      "description": "Month (optional, defaults to current)"
-    },
-    "day": {
-      "type": "integer",
-      "description": "Day (optional, defaults to current)"
-    },
-    "locationName": {
-      "type": "string",
-      "description": "Name of the city/location"
-    }
+    "latitude": { "type": "number" },
+    "longitude": { "type": "number" },
+    "timezone": { "type": "number" },
+    "locationName": { "type": "string" },
+    "year": { "type": "integer" },
+    "month": { "type": "integer" },
+    "day": { "type": "integer" }
   },
   "required": ["latitude", "longitude", "timezone"]
 }
 ```
 
-4.  **Workflow Operation**:
-    *   The tool will output the parameters.
-    *   Connect the **Define Custom Tool** output to an **HTTP Request** node.
-    *   **HTTP Request Node Config**:
-        *   **Method**: `GET`
-        *   **URL**: `https://panchang.visionpair.cloud/api/panchanga`
-        *   **Authentication**: None (Public API)
-        *   **Query Parameters**: Map the fields from the tool input (latitude, longitude, etc.).
-
-## Option 2: Standard Workflow (HTTP Request)
-
-If you just want to get data without an AI Agent:
-
-1.  Add an **HTTP Request** node.
-2.  **Method**: `GET`
-3.  **URL**: `https://panchang.visionpair.cloud/api/panchanga`
-4.  **Query Parameters**:
-    *   `latitude`: `33.1507` (or value from previous node)
-    *   `longitude`: `-96.8236`
-    *   `timezone`: `-6.0`
-    *   `locationName`: `Frisco`
-5.  Execute the node to get the JSON response.
-
-## Why not use the MCP Server URL?
-
-The MCP Server (`panchang-mcp.visionpair.cloud`) uses the **SSE (Server-Sent Events)** protocol designed for desktop AI apps. n8n currently supports **REST APIs** natively. Since your project hosts both, using the REST API (`panchang.visionpair.cloud`) is faster, more reliable, and native to n8n.
+**Workflow Connection**:
+*   Connect the tool to an **HTTP Request** node.
+*   **URL**: `https://panchang-mcp.visionpair.cloud/api/voice`
+*   **Header**: `X-API-Key: YOUR_SECRET_KEY`

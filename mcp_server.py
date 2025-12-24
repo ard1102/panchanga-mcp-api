@@ -96,6 +96,65 @@ secure_app.add_middleware(APIKeyMiddleware)
 async def health_check():
     return {"status": "healthy", "service": "panchanga-mcp"}
 
+# -----------------------------------------------------------------------------
+# REST Endpoints for n8n / External Apps
+# -----------------------------------------------------------------------------
+
+@secure_app.get("/api/panchanga")
+async def rest_get_panchanga(
+    latitude: float, 
+    longitude: float, 
+    timezone: float, 
+    year: int = None, 
+    month: int = None, 
+    day: int = None, 
+    location_name: str = "Unknown"
+):
+    """REST endpoint to get Panchanga data (High Precision)"""
+    return get_panchanga(latitude, longitude, timezone, year, month, day, location_name)
+
+@secure_app.get("/api/sankalpam")
+async def rest_get_sankalpam(
+    latitude: float, 
+    longitude: float, 
+    timezone: float, 
+    year: int = None, 
+    month: int = None, 
+    day: int = None, 
+    location_name: str = "Unknown"
+):
+    """REST endpoint to get Sankalpam text"""
+    return get_sankalpam(latitude, longitude, timezone, year, month, day, location_name)
+
+@secure_app.get("/api/voice")
+async def rest_get_voice(
+    latitude: float, 
+    longitude: float, 
+    timezone: float, 
+    year: int = None, 
+    month: int = None, 
+    day: int = None, 
+    location_name: str = "Unknown"
+):
+    """REST endpoint to get Sankalpam Audio (Base64)"""
+    result = get_sankalpam_voice(latitude, longitude, timezone, year, month, day, location_name)
+    
+    # Handle error or file reading logic (duplicated from tool for safety)
+    if "error" in result:
+        return JSONResponse(status_code=400, content=result)
+        
+    audio_path = result.get("audio_file")
+    if audio_path and os.path.exists(audio_path):
+        try:
+            with open(audio_path, "rb") as audio_file:
+                encoded_string = base64.b64encode(audio_file.read()).decode('utf-8')
+            result["audio_base64"] = encoded_string
+            # Optional: Cleanup is handled in get_sankalpam_voice mostly, but we can do it here too if needed
+        except Exception as e:
+            return JSONResponse(status_code=500, content={"error": f"Failed to encode audio: {str(e)}"})
+            
+    return result
+
 # Mount the MCP server
 # FastMCP instances are ASGI applications
 secure_app.mount("/", mcp)
