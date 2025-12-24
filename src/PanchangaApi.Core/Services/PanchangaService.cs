@@ -15,7 +15,7 @@ public interface IPanchangaService
     Task<KaranaInfo> CalculateKaranaAsync(double julianDay, Location location);
     Task<VaraInfo> CalculateVaraAsync(double julianDay);
     Task<MasaInfo> CalculateMasaAsync(double julianDay, Location location);
-    Task<SamvatsaraInfo> CalculateSamvatsaraAsync(double julianDay, int masaNumber);
+    Task<SamvatsaraInfo> CalculateSamvatsaraAsync(int year, int masaNumber);
     Task<RituInfo> CalculateRituAsync(int masaNumber);
 }
 
@@ -56,7 +56,7 @@ public class PanchangaService : IPanchangaService
             var karana = await CalculateKaranaAsync(julianDay, location);
             var vara = await CalculateVaraAsync(julianDay);
             var masa = await CalculateMasaAsync(julianDay, location);
-            var samvatsara = await CalculateSamvatsaraAsync(julianDay, masa.Number);
+            var samvatsara = await CalculateSamvatsaraAsync(date.Year, masa.Number);
             var ritu = await CalculateRituAsync(masa.Number);
 
             // Calculate sunrise and sunset
@@ -193,17 +193,24 @@ public class PanchangaService : IPanchangaService
         return new MasaInfo(masaNumber, masaName, false);
     }
 
-    public async Task<SamvatsaraInfo> CalculateSamvatsaraAsync(double julianDay, int masaNumber)
+    public async Task<SamvatsaraInfo> CalculateSamvatsaraAsync(int year, int masaNumber)
     {
         await Task.CompletedTask; // For async pattern
         
-        var ahargana = julianDay - KALI_YUGA_EPOCH;
-        var siderealYear = 365.25636;
+        // Calculate Saka Year
+        // If masaNumber >= 10 (approx Jan-Mar, i.e., Makara, Kumbha, Mina), 
+        // we are in the previous Saka year (relative to Gregorian year)
+        var effectiveYear = year;
+        if (masaNumber >= 10)
+        {
+            effectiveYear -= 1;
+        }
         
-        var kali = (int)((ahargana + (4 - masaNumber) * 30) / siderealYear);
+        var sakaYear = effectiveYear - 78;
         
-        // Calculate Samvatsara (60-year cycle)
-        var samvatsaraNumber = ((kali + 27 + (int)((kali * 211 - 108) / 18000)) % 60) + 1;
+        // South Indian / Standard System:
+        // (SakaYear + 11) % 60 + 1
+        var samvatsaraNumber = ((sakaYear + 11) % 60) + 1;
         if (samvatsaraNumber <= 0) samvatsaraNumber += 60;
         
         var samvatsaraName = _sanskritNamesService.GetSamvatsaraName(samvatsaraNumber);

@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  panchanga-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+    restart: unless-stopped
+
+  panchanga-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile.mcp
+    ports:
+      - "8000:8000"
+    environment:
+      - PANCHANGAM_API_URL=http://panchanga-api:8080/api/panchanga
+      - MCP_API_KEY=${MCP_API_KEY:-panchanga-secret-key}
+    depends_on:
+      - panchanga-api
+    restart: unless-stopped

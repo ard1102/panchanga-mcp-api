@@ -1,0 +1,128 @@
+[
+  {
+    "name": "get_panchanga",
+    "description": "Calculate the Hindu Panchanga (calendar) for a specific date and location. Returns details like Tithi, Nakshatra, Yoga, Karana, Vara, Sunrise, and Sunset.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "latitude": {
+          "type": "number",
+          "description": "The latitude of the location (e.g., 33.1507 for Frisco, TX)."
+        },
+        "longitude": {
+          "type": "number",
+          "description": "The longitude of the location (e.g., -96.8236 for Frisco, TX)."
+        },
+        "timezone": {
+          "type": "number",
+          "description": "The timezone offset from UTC (e.g., -6.0 for CST, 5.5 for IST)."
+        },
+        "year": {
+          "type": "integer",
+          "description": "The year for the calculation (optional, defaults to current year)."
+        },
+        "month": {
+          "type": "integer",
+          "description": "The month for the calculation (1-12) (optional, defaults to current month)."
+        },
+        "day": {
+          "type": "integer",
+          "description": "The day of the month for the calculation (optional, defaults to current day)."
+        },
+        "location_name": {
+          "type": "string",
+          "description": "A human-readable name for the location (e.g., 'Frisco, TX')."
+        }
+      },
+      "required": [
+        "latitude",
+        "longitude",
+        "timezone"
+      ]
+    }
+  },
+  {
+    "name": "get_sankalpam",
+    "description": "Generates the Sankalpam mantra string for a specific date and location, including Samvatsara, Ayana, Ritu, Masa, Paksha, Tithi, Vara, and Nakshatra.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "latitude": {
+          "type": "number",
+          "description": "The latitude of the location."
+        },
+        "longitude": {
+          "type": "number",
+          "description": "The longitude of the location."
+        },
+        "timezone": {
+          "type": "number",
+          "description": "The timezone offset from UTC."
+        },
+        "year": {
+          "type": "integer",
+          "description": "The year (optional)."
+        },
+        "month": {
+          "type": "integer",
+          "description": "The month (optional)."
+        },
+        "day": {
+          "type": "integer",
+          "description": "The day (optional)."
+        },
+        "location_name": {
+          "type": "string",
+          "description": "Name of the location."
+        }
+      },
+      "required": [
+        "latitude",
+        "longitude",
+        "timezone"
+      ]
+    }
+  },
+  {
+    "name": "get_sankalpam_voice",
+    "description": "Generates an audio file (MP3) of the Sankalpam mantra for a specific date and location. Returns the file path and text.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "latitude": {
+          "type": "number",
+          "description": "The latitude of the location."
+        },
+        "longitude": {
+          "type": "number",
+          "description": "The longitude of the location."
+        },
+        "timezone": {
+          "type": "number",
+          "description": "The timezone offset from UTC."
+        },
+        "year": {
+          "type": "integer",
+          "description": "The year (optional)."
+        },
+        "month": {
+          "type": "integer",
+          "description": "The month (optional)."
+        },
+        "day": {
+          "type": "integer",
+          "description": "The day (optional)."
+        },
+        "location_name": {
+          "type": "string",
+          "description": "Name of the location."
+        }
+      },
+      "required": [
+        "latitude",
+        "longitude",
+        "timezone"
+      ]
+    }
+  }
+]

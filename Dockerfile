@@ -31,4 +31,5 @@ COPY --from=publish /app/publish .
 COPY sanskrit-names.json .
 
 ENV ASPNETCORE_URLS=http://+:8080
+ENV ASPNETCORE_ENVIRONMENT=Docker
 ENTRYPOINT ["dotnet", "PanchangaApi.dll"]

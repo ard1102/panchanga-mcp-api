@@ -433,6 +433,17 @@ sudo apt-get install -y aspnetcore-runtime-8.0
 - **PROJECT_SUMMARY.md** - Technical architecture and feature overview
 - **Swagger UI** - Interactive API documentation (when running)
 
+## 🤖 AI & MCP Integration
+
+This project now includes a **Model Context Protocol (MCP)** server, allowing AI agents (like Claude Desktop, n8n, etc.) to natively interact with the Panchanga API.
+
+### Features
+- **Get Panchanga**: Retrieve detailed almanac data.
+- **Get Sankalpam**: Generate specific Sankalpam text and audio.
+- **High-Precision**: Uses `PyEphem` for accurate astronomical calculations (Tithi/Nakshatra/Sunrise) with automatic fallback.
+
+👉 **[Read the MCP Documentation](README_MCP.md)** for setup and usage instructions.
+
 ## 🤝 Contributing
 
 1. Fork the repository

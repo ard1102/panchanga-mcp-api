@@ -1,0 +1,9 @@
+mcp
+fastapi
+uvicorn
+requests
+edge-tts
+indic-transliteration
+nest_asyncio
+python-multipart
+sse-starlette

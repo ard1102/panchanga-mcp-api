@@ -2,6 +2,17 @@ using PanchangaApi.Core.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure Kestrel for Docker environment
+if (builder.Environment.EnvironmentName == "Docker")
+{
+    // Clear existing configuration to prevent HTTPS conflicts from appsettings.json
+    builder.Configuration.Sources.Clear();
+    
+    // Add back essential configuration sources
+    builder.Configuration.AddJsonFile("appsettings.Docker.json", optional: true, reloadOnChange: true);
+    builder.Configuration.AddEnvironmentVariables();
+}
+
 // Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
