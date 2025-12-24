@@ -176,7 +176,7 @@ async def rest_get_voice(
 
 # Mount the MCP server
 # FastMCP instances are ASGI applications
-secure_app.mount("/", mcp)
+secure_app.mount("/", mcp.sse_app)
 
 if __name__ == "__main__":
     print(f"Starting MCP Server on port 8000...")
