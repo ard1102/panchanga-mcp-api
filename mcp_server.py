@@ -94,7 +94,12 @@ class APIKeyMiddleware:
              await self.app(scope, receive, send)
              return
              
-        # 1. Check Header
+        # 1. Allow /messages if session_id is present (Authenticated via SSE session)
+        if (path.startswith("/messages") or path.startswith("/messages/")) and request.query_params.get("session_id"):
+             await self.app(scope, receive, send)
+             return
+
+        # 2. Check Header
         api_key = request.headers.get(API_KEY_NAME)
         if not api_key:
             api_key = request.headers.get("MCP_API_KEY") # Fallback for user convenience
