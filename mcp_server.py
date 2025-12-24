@@ -123,7 +123,13 @@ class APIKeyMiddleware:
 # Create a secure wrapper application
 secure_app = FastAPI()
 
-# Add CORS Middleware
+# Add API Key Middleware FIRST (Inner-most)
+# This will run AFTER CORS middleware on the way in, and BEFORE CORS middleware on the way out
+secure_app.add_middleware(APIKeyMiddleware)
+
+# Add CORS Middleware LAST (Outer-most)
+# This ensures it wraps everything else and can handle OPTIONS requests
+# and add headers even if inner middleware returns errors (like 403).
 secure_app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allow all origins
@@ -131,8 +137,6 @@ secure_app.add_middleware(
     allow_methods=["*"],  # Allow all methods (including OPTIONS)
     allow_headers=["*"],  # Allow all headers
 )
-
-secure_app.add_middleware(APIKeyMiddleware)
 
 @secure_app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
