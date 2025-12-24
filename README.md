@@ -8,6 +8,7 @@ If you are looking to use this with **Claude**, **n8n**, or other AI agents, ple
 
 👉 **[MCP Server Documentation](README_MCP.md)**
 👉 **[n8n Integration Guide](N8N_INTEGRATION.md)**
+👉 **[IDE Integration (Claude/Cursor)](IDE_INTEGRATION.md)**
 
 ---
 
