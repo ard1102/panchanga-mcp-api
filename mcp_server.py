@@ -92,6 +92,10 @@ class APIKeyMiddleware(BaseHTTPMiddleware):
 secure_app = FastAPI()
 secure_app.add_middleware(APIKeyMiddleware)
 
+@secure_app.get("/health")
+async def health_check():
+    return {"status": "healthy", "service": "panchanga-mcp"}
+
 # Mount the MCP server
 # FastMCP instances are ASGI applications
 secure_app.mount("/", mcp)
