@@ -6,13 +6,22 @@ You have three ways to use the Panchangam service in n8n.
 
 If you are using the **AI Agent** node in n8n (versions 1.70+), you can connect this tool directly as an MCP Tool.
 
+### How it Works
+1.  **Connection**: n8n connects to the Panchangam MCP server using a persistent **HTTP Streamable** connection.
+2.  **Discovery**: Upon connection, n8n automatically retrieves the list of available tools (`get_panchanga_data`, `get_sankalpam_text`, etc.).
+3.  **Execution**: When you ask the AI Agent a question (e.g., "What is the Sankalpam for New York?"), the LLM decides which tool to call. n8n sends this request to the server, which executes the Python code and returns the result.
+
+### Configuration Steps
 1.  Open your **AI Agent** node.
 2.  Click **"Add Tool"** -> Select **"MCP Tool"**.
-3.  In the MCP Tool configuration:
-    *   **Connection Type**: Select **"HTTP streamable"** (Note: In some versions this might be labeled "SSE", but "HTTP streamable" is the newer standard for MCP in n8n).
-    *   **Server URL**: `https://panchang-mcp.visionpair.cloud/sse?api_key=YOUR_API_KEY_HERE`
-    
-    *(We use the `?api_key=` query parameter because n8n's MCP UI may not yet support custom headers).*
+3.  **Create New Credentials**:
+    *   **Type**: Select **"MCP Client (HTTP Streamable) API"**.
+    *   **HTTP Streamable URL**: `https://panchang-mcp.visionpair.cloud/sse`
+    *   **Additional Headers**: 
+        ```
+        X-API-Key: YOUR_API_KEY_HERE
+        ```
+        *(If your n8n version doesn't support "Additional Headers", append `?api_key=YOUR_API_KEY_HERE` to the URL instead).*
 
 4.  The AI Agent will now automatically see all available tools:
     *   `get_panchanga_data`
