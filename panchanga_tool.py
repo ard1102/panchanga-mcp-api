@@ -181,7 +181,42 @@ def get_panchanga(latitude, longitude, timezone, year=None, month=None, day=None
     try:
         response = requests.get(base_url, params=params)
         response.raise_for_status()
-        return response.json()
+        data = response.json()
+        
+        # Override with Accurate Local Calculation
+        # This ensures /api/panchanga returns the same high-precision data as Sankalpam
+        try:
+            # Extract date from response or use input params
+            d_year = data.get('date', {}).get('year', year)
+            d_month = data.get('date', {}).get('month', month)
+            d_day = data.get('date', {}).get('day', day)
+            
+            accurate_data = get_accurate_panchanga_local(latitude, longitude, timezone, d_year, d_month, d_day)
+            
+            if accurate_data:
+                # Override Tithi
+                if 'tithi' in data:
+                    data['tithi']['name'] = accurate_data['tithi']
+                    # Also update paksha in tithi name if possible or separate field? 
+                    # The C# API structure might not have 'paksha' field at top level, often inside tithi or separate.
+                    # We'll just update the name for now.
+                
+                # Override Nakshatra
+                if 'nakshatra' in data:
+                    data['nakshatra']['name'] = accurate_data['nakshatra']
+                    
+                # Override Masa
+                if 'masa' in data:
+                    data['masa']['name'] = accurate_data['masa']
+                    
+                # Add a flag to indicate accurate calculation
+                data['calculation_method'] = "High Precision (pyephem)"
+                
+        except Exception as e:
+            print(f"Failed to override with accurate data: {e}")
+            
+        return data
+
     except requests.exceptions.RequestException as e:
         return {"error": str(e)}
 
